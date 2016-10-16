@@ -15,7 +15,7 @@ function theme_diff_node_revisions($vars) {
   // Overview table:
   $header = array(
     t('Revision'),
-    array('data' => drupal_render($form['submit']), 'colspan' => 2),
+    array('data' => backdrop_render($form['submit']), 'colspan' => 2),
     array('data' => t('Operations'), 'colspan' => 2),
   );
   if (isset($form['info']) && is_array($form['info'])) {
@@ -24,11 +24,11 @@ function theme_diff_node_revisions($vars) {
       if (isset($form['operations'][$key][0])) {
         // Note: even if the commands for revert and delete are not permitted,
         // the array is not empty since we set a dummy in this case.
-        $row[] = drupal_render($form['info'][$key]);
-        $row[] = drupal_render($form['diff']['old'][$key]);
-        $row[] = drupal_render($form['diff']['new'][$key]);
-        $row[] = drupal_render($form['operations'][$key][0]);
-        $row[] = drupal_render($form['operations'][$key][1]);
+        $row[] = backdrop_render($form['info'][$key]);
+        $row[] = backdrop_render($form['diff']['old'][$key]);
+        $row[] = backdrop_render($form['diff']['new'][$key]);
+        $row[] = backdrop_render($form['operations'][$key][0]);
+        $row[] = backdrop_render($form['operations'][$key][1]);
         $rows[] = array(
           'data' => $row,
           'class' => array('diff-revision'),
@@ -37,15 +37,15 @@ function theme_diff_node_revisions($vars) {
       else {
         // The current revision (no commands to revert or delete).
         $row[] = array(
-          'data' => drupal_render($form['info'][$key]),
+          'data' => backdrop_render($form['info'][$key]),
           'class' => array('revision-current'),
         );
         $row[] = array(
-          'data' => drupal_render($form['diff']['old'][$key]),
+          'data' => backdrop_render($form['diff']['old'][$key]),
           'class' => array('revision-current'),
         );
         $row[] = array(
-          'data' => drupal_render($form['diff']['new'][$key]),
+          'data' => backdrop_render($form['diff']['new'][$key]),
           'class' => array('revision-current'),
         );
         $row[] = array(
@@ -67,7 +67,7 @@ function theme_diff_node_revisions($vars) {
     'attributes' => array('class' => array('diff-revisions')),
   ));
 
-  $output .= drupal_render_children($form);
+  $output .= backdrop_render_children($form);
   return $output;
 }
 
@@ -101,9 +101,9 @@ function theme_diff_empty_line($vars) {
  */
 function theme_diff_inline_form($vars) {
   if ($theme = variable_get('diff_theme', 'default')) {
-    drupal_add_css(drupal_get_path('module', 'diff') . "/css/diff.{$theme}.css");
+    backdrop_add_css(backdrop_get_path('module', 'diff') . "/css/diff.{$theme}.css");
   }
-  return drupal_render_children($vars['form']);
+  return backdrop_render_children($vars['form']);
 }
 
 /**
@@ -111,7 +111,7 @@ function theme_diff_inline_form($vars) {
  */
 function theme_diff_inline_metadata($vars) {
   if ($theme = variable_get('diff_theme', 'default')) {
-    drupal_add_css(drupal_get_path('module', 'diff') . "/css/diff.{$theme}.css");
+    backdrop_add_css(backdrop_get_path('module', 'diff') . "/css/diff.{$theme}.css");
   }
   $node = $vars['node'];
 

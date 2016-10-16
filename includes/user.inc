@@ -137,7 +137,7 @@ function _user_entity_diff_additional_options_roles($old_user, $new_user, $conte
   );
 
   $roles = user_roles(TRUE);
-  unset($roles[DRUPAL_AUTHENTICATED_RID]);
+  unset($roles[BACKDROP_AUTHENTICATED_RID]);
   foreach ($context['states'] as $state) {
     $row['#states'][$state] = array(
       '#old' => array(implode("\n", array_intersect_key($roles, $old_user->roles))),

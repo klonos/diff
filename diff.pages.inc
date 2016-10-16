@@ -11,11 +11,11 @@
 function diff_latest($node) {
   $revisions = node_revision_list($node);
   if (count($revisions) < 2 || !diff_node_revision_access($node, 'view')) {
-    drupal_goto('node/' . $node->nid);
+    backdrop_goto('node/' . $node->nid);
   }
   $new = array_shift($revisions);
   $old = array_shift($revisions);
-  drupal_goto("node/{$node->nid}/revisions/view/{$old->vid}/{$new->vid}");
+  backdrop_goto("node/{$node->nid}/revisions/view/{$old->vid}/{$new->vid}");
 }
 
 /**
@@ -25,8 +25,8 @@ function diff_latest($node) {
  * an input form to select two revisions for a comparison.
  */
 function diff_diffs_overview($node) {
-  drupal_set_title(t('Revisions for %title', array('%title' => $node->title)), PASS_THROUGH);
-  return drupal_get_form('diff_node_revisions', $node);
+  backdrop_set_title(t('Revisions for %title', array('%title' => $node->title)), PASS_THROUGH);
+  return backdrop_get_form('diff_node_revisions', $node);
 }
 
 /**
@@ -173,7 +173,7 @@ function diff_diffs_show($node, $old_vid, $new_vid, $state = NULL) {
 
   // Same title as the 'Revisions' tab. Blocked by non-page requests.
   if (node_is_page($node)) {
-    drupal_set_title(t('Revisions for %title', array('%title' => $node->title)), PASS_THROUGH);
+    backdrop_set_title(t('Revisions for %title', array('%title' => $node->title)), PASS_THROUGH);
   }
   $node_revisions = node_revision_list($node);
 
@@ -304,11 +304,11 @@ function diff_diffs_show($node, $old_vid, $new_vid, $state = NULL) {
  *   The context used to render the diff.
  */
 function diff_entity_body_rows($entity_type, $left_entity, $right_entity, $context = array()) {
-  // This is an unique index only, so no need for drupal_static().
+  // This is an unique index only, so no need for backdrop_static().
   static $table_row_counter = 0;
 
   if ($theme = variable_get('diff_theme', 'default')) {
-    drupal_add_css(drupal_get_path('module', 'diff') . "/css/diff.{$theme}.css");
+    backdrop_add_css(backdrop_get_path('module', 'diff') . "/css/diff.{$theme}.css");
   }
 
   $rows = array();
@@ -428,7 +428,7 @@ function diff_compare_entities($left_entity, $right_entity, $context) {
   $diff = module_invoke_all('entity_diff', $left_entity, $right_entity, $context);
 
   // Allow other modules to interact directly with the results.
-  drupal_alter('entity_diff', $diff, $context);
+  backdrop_alter('entity_diff', $diff, $context);
 
   // We start off assuming all form elements are in the correct order.
   $diff['#sorted'] = TRUE;
@@ -635,13 +635,13 @@ function _diff_default_header($old_header = '', $new_header = '') {
 function diff_inline_show($node, $vid = 0, $metadata = TRUE) {
   $new_node = $vid ? node_load($node->nid, $vid, TRUE) : clone $node;
   node_build_content($new_node);
-  $new = drupal_render($new_node->content);
+  $new = backdrop_render($new_node->content);
 
   $old = $vid ? _diff_get_previous_vid(node_revision_list($node), $vid) : 0;
   if ($old) {
     $old_node = node_load($node->nid, $old, TRUE);
     node_build_content($old_node);
-    $old = drupal_render($old_node->content);
+    $old = backdrop_render($old_node->content);
     $output = $metadata ? theme('diff_inline_metadata', array('node' => $new_node)) : '';
     $output .= diff_get_inline($old, $new);
     return $output;

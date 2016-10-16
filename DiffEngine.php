@@ -244,7 +244,7 @@ class _DiffEngine {
    * Returns the whole line if it's small enough, or the MD5 hash otherwise.
    */
   function _line_hash($line) {
-    if (drupal_strlen($line) > $this->MAX_XREF_LENGTH()) {
+    if (backdrop_strlen($line) > $this->MAX_XREF_LENGTH()) {
       return md5($line);
     }
     else {
@@ -998,7 +998,7 @@ class _HWLDF_WordAccumulator {
       }
       if ($word[0] == "\n") {
         $this->_flushLine($tag);
-        $word = drupal_substr($word, 1);
+        $word = backdrop_substr($word, 1);
       }
       assert(!strstr($word, "\n"));
       $this->_group .= $word;
@@ -1042,7 +1042,7 @@ class WordLevelDiff extends MappedDiff {
         $words[] = "\n";
         $stripped[] = "\n";
       }
-      if ( drupal_strlen( $line ) > $this->MAX_LINE_LENGTH() ) {
+      if ( backdrop_strlen( $line ) > $this->MAX_LINE_LENGTH() ) {
         $words[] = $line;
         $stripped[] = $line;
       }
@@ -1088,11 +1088,11 @@ class WordLevelDiff extends MappedDiff {
 }
 
 /**
- * Diff formatter which uses Drupal theme functions.
+ * Diff formatter which uses Backdrop theme functions.
  * @private
  * @subpackage DifferenceEngine
  */
-class DrupalDiffFormatter extends DiffFormatter {
+class BackdropDiffFormatter extends DiffFormatter {
 
   var $rows;
   var $line_stats = array(
@@ -1227,11 +1227,11 @@ class DrupalDiffFormatter extends DiffFormatter {
 }
 
 /**
- * Drupal inline Diff formatter.
+ * Backdrop inline Diff formatter.
  * @private
  * @subpackage DifferenceEngine
  */
-class DrupalDiffInline {
+class BackdropDiffInline {
   var $a;
   var $b;
 
@@ -1261,7 +1261,7 @@ class DrupalDiffInline {
           break;
         case 'delete':
           foreach ($chunk->orig as $i => $piece) {
-            if (strpos($piece, '<') === 0 && drupal_substr($piece, drupal_strlen($piece) - 1) === '>') {
+            if (strpos($piece, '<') === 0 && backdrop_substr($piece, backdrop_strlen($piece) - 1) === '>') {
               $output .= $piece;
             }
             else {
@@ -1272,7 +1272,7 @@ class DrupalDiffInline {
         default:
           $chunk->closing = $this->process_chunk($chunk->closing);
           foreach ($chunk->closing as $i => $piece) {
-            if ($piece === ' ' || (strpos($piece, '<') === 0 && drupal_substr($piece, drupal_strlen($piece) - 1) === '>' && drupal_strtolower(drupal_substr($piece, 1, 3)) != 'img')) {
+            if ($piece === ' ' || (strpos($piece, '<') === 0 && backdrop_substr($piece, backdrop_strlen($piece) - 1) === '>' && backdrop_strtolower(backdrop_substr($piece, 1, 3)) != 'img')) {
               $output .= $piece;
             }
             else {
@@ -1296,11 +1296,11 @@ class DrupalDiffInline {
       if (!isset($processed[$j])) {
         $processed[$j] = '';
       }
-      if (strpos($piece, '<') === 0 && drupal_substr($piece, drupal_strlen($piece) - 1) === '>') {
+      if (strpos($piece, '<') === 0 && backdrop_substr($piece, backdrop_strlen($piece) - 1) === '>') {
         $processed[$j] = $piece;
         $j++;
       }
-      elseif (isset($next) && strpos($next, '<') === 0 && drupal_substr($next, drupal_strlen($next) - 1) === '>') {
+      elseif (isset($next) && strpos($next, '<') === 0 && backdrop_substr($next, backdrop_strlen($next) - 1) === '>') {
         $processed[$j] .= $piece;
         $j++;
       }

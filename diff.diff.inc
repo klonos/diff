@@ -130,7 +130,7 @@ function diff_entity_fields_diff($old_entity, $new_entity, $context, $default_la
         $func($old_items, $new_items, $field_context);
       }
       // Allow other modules to act safely on behalf of the core field module.
-      drupal_alter('field_diff_view_prepare', $old_items, $new_items, $field_context);
+      backdrop_alter('field_diff_view_prepare', $old_items, $new_items, $field_context);
 
       // These functions compiles the items into comparable arrays of strings.
       $func = $field['module'] . '_field_diff_view';
@@ -147,8 +147,8 @@ function diff_entity_fields_diff($old_entity, $new_entity, $context, $default_la
       $new_values = $func($new_items, $new_context);
 
       // Allow other modules to act safely on behalf of the core field module.
-      drupal_alter('field_diff_view', $old_values, $old_items, $old_context);
-      drupal_alter('field_diff_view', $new_values, $new_items, $new_context);
+      backdrop_alter('field_diff_view', $old_values, $old_items, $old_context);
+      backdrop_alter('field_diff_view', $new_values, $new_items, $new_context);
 
       $max = max(array(count($old_values), count($new_values)));
       if ($max) {
@@ -209,7 +209,7 @@ function diff_field_diff_view($items, $context) {
    $element = field_view_field($context['entity_type'], $entity, $context['field']['field_name'], $view_mode, $langcode);
 
    foreach (element_children($element) as $delta) {
-     $diff_items[$delta] = drupal_render($element[$delta]);
+     $diff_items[$delta] = backdrop_render($element[$delta]);
    }
   return $diff_items;
 }
@@ -236,7 +236,7 @@ function diff_get_field_settings($field_context) {
   $settings = _diff_field_default_settings($field['module'], $field['type'], $settings);
 
   // Allow modules to alter the field settings based on the current context.
-  drupal_alter('diff_field_settings', $settings, $field_context);
+  backdrop_alter('diff_field_settings', $settings, $field_context);
 
   return $settings;
 }
@@ -256,7 +256,7 @@ function diff_global_settings_form(&$subform, $form_state, $type, $settings) {
     '#title' => t('Markdown callback'),
     '#default_value' => $settings['markdown'],
     '#options' => array(
-      'drupal_html_to_text' => t('Drupal HTML to Text'),
+      'backdrop_html_to_text' => t('Backdrop HTML to Text'),
       'filter_xss' => t('Filter XSS (some tags)'),
       'diff_filter_xss' => t('Filter XSS (all tags)'),
     ),
@@ -322,7 +322,7 @@ function _diff_field_default_settings($module, $field_type, $settings = array())
 
   // Global settings.
   $settings += array(
-    'markdown' => function_exists($func) ? '' : 'drupal_html_to_text',
+    'markdown' => function_exists($func) ? '' : 'backdrop_html_to_text',
     'line_counter' => '',
     'show_header' => 1,
     // Can we? This seems too hard to track in the DiffFormatter as all we
@@ -340,7 +340,7 @@ function _diff_field_default_settings($module, $field_type, $settings = array())
  *   The field definition array or the module that implements the field.
  */
 function _diff_autoload($field_or_module) {
-  $includes = &drupal_static(__FUNCTION__, FALSE);
+  $includes = &backdrop_static(__FUNCTION__, FALSE);
   if (!$includes) {
     $includes = array(
       'file' => module_exists('file'),

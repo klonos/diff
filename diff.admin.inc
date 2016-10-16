@@ -12,7 +12,7 @@ function diff_admin_settings($form, $form_state) {
   $form['diff_theme'] = array(
     '#type' => 'select',
     '#title' => t('CSS options'),
-    '#default_value' => variable_get('diff_theme', 'default'),
+    '#default_value' => config_get('diff.settings','diff_theme'),
     '#options' => array(
       'default' => t('Classic'),
       'boxes' => t('Boxes'),
@@ -23,7 +23,7 @@ function diff_admin_settings($form, $form_state) {
   $form['diff_radio_behavior'] = array(
     '#type' => 'select',
     '#title' => t('Diff radio behavior'),
-    '#default_value' => variable_get('diff_radio_behavior', 'simple'),
+    '#default_value' => config_get('diff.settings','diff_radio_behavior'),
     '#options' => array(
       'simple' => t('Simple exclusion'),
       'linear' => t('Linear restrictions'),
@@ -32,23 +32,43 @@ function diff_admin_settings($form, $form_state) {
     '#description' => t('<em>Simple exclusion</em> means that users will not be able to select the same revision, <em>Linear restrictions</em> means that users can only select older or newer revisions of the current selections.'),
   );
 
-  $options = drupal_map_assoc(array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+  $options = backdrop_map_assoc(array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
   $form['diff_context_lines_leading'] = array(
     '#type' => 'select',
     '#title' => t('Leading context lines'),
     '#description' => t('This governs the number of unchanged leading context "lines" to preserve.'),
-    '#default_value' => variable_get('diff_context_lines_leading', 2),
+    '#default_value' => config_get('diff.settings','diff_context_lines_leading'),
     '#options' => $options,
   );
   $form['diff_context_lines_trailing'] = array(
     '#type' => 'select',
     '#title' => t('Trailing context lines'),
     '#description' => t('This governs the number of unchanged trailing context "lines" to preserve.'),
-    '#default_value' => variable_get('diff_context_lines_trailing', 2),
+    '#default_value' => config_get('diff.settings','diff_context_lines_trailing'),
     '#options' => $options,
   );
 
-  return system_settings_form($form);
+  // Add a submit button
+  $form['actions']['#type'] = 'actions';
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save configuration'),
+  );
+
+  return $form;
+}
+
+/**
+ * Submit handler for module_settings_form().
+ */
+function diff_admin_settings_submit($form, &$form_state){
+  $config = config('diff.settings');
+  $config->set('diff_theme', $form_state['values']['diff_theme']);
+  $config->set('diff_radio_behavior', $form_state['values']['diff_radio_behavior']);
+  $config->set('diff_context_lines_leading', $form_state['values']['diff_context_lines_leading']);
+  $config->set('diff_context_lines_trailing', $form_state['values']['diff_context_lines_trailing']);
+  $config->save();
+  backdrop_set_message(t('The configuration options have been saved.'));
 }
 
 /**
@@ -56,13 +76,13 @@ function diff_admin_settings($form, $form_state) {
  */
 function diff_admin_global_entity_settings($form, $form_state, $entity_type) {
   $entity_info = entity_get_info($entity_type);
-  drupal_set_title(t('Diff settings for %entity_label entities', array('%entity_label' => $entity_info['label'])), PASS_THROUGH);
+  backdrop_set_title(t('Diff settings for %entity_label entities', array('%entity_label' => $entity_info['label'])), PASS_THROUGH);
 
   if ($options = module_invoke_all('entity_diff_options', $entity_type)) {
     $form['diff_additional_options_' . $entity_type] = array(
       '#type' => 'checkboxes',
       '#title' => t('Property options'),
-      '#default_value' => variable_get('diff_additional_options_' . $entity_type, array()),
+      '#default_value' => config_get('diff.settings','diff_additional_options_' . $entity_type),
       '#options' => $options,
     );
   }
@@ -76,7 +96,7 @@ function diff_admin_global_entity_settings($form, $form_state, $entity_type) {
   $form['diff_show_header_' . $entity_type] = array(
     '#type' => 'checkbox',
     '#title' => t('Show entity label row header'),
-    '#default_value' => variable_get('diff_show_header_' . $entity_type, 1),
+    '#default_value' => config_get('diff.settings','diff_show_header_' . $entity_type),
   );
   if (user_access('administer permissions')) {
     $admin_link = l(t('View the administration theme'), 'admin/people/permissions', array('fragment' => 'edit-view-the-administration-theme'));
@@ -88,12 +108,12 @@ function diff_admin_global_entity_settings($form, $form_state, $entity_type) {
     '#type' => 'checkbox',
     '#title' => t('Use administration theme'),
     '#description' => t('This option will enable users with the <em>!link</em> permission to use the admin theme when doing comparisons.', array('!link' => $admin_link)),
-    '#default_value' => variable_get('diff_admin_path_' . $entity_type, 1),
+    '#default_value' => config_get('diff.settings','diff_admin_path_' . $entity_type),
   );
   $form['diff_default_state_' . $entity_type] = array(
     '#type' => 'select',
     '#title' => t('Diff default state'),
-    '#default_value' => variable_get('diff_default_state_' . $entity_type, 'raw'),
+    '#default_value' => config_get('diff.settings','diff_default_state_' . $entity_type),
     '#options' => array(
       'raw' => t('HTML view'),
       'raw_plain' => t('Plain view'),
@@ -101,8 +121,31 @@ function diff_admin_global_entity_settings($form, $form_state, $entity_type) {
     '#empty_option' => t('- None -'),
     '#description' => t('Default display to show when viewing a diff, html tags in diffed result or as plain text.'),
   );
-  return system_settings_form($form);
+
+  // Add a submit button
+  $form['actions']['#type'] = 'actions';
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save configuration'),
+  );
+
+  return $form;
 }
+
+/**
+ * Submit handler for global_entity_settings_form().
+ */
+function diff_admin_global_entity_settings_submit($form, &$form_state){
+  $config = config('diff.settings');
+  $entity_type = 1;
+  $config->set('diff_additional_options_' . $entity_type, $form_state['values']['diff_additional_options_' . $entity_type]);
+  $config->set('diff_show_header_' . $entity_type, $form_state['values']['diff_show_header_' . $entity_type]);
+  $config->set('diff_admin_path_' . $entity_type, $form_state['values']['diff_admin_path_' . $entity_type]);
+  $config->set('diff_default_state_' . $entity_type, $form_state['values']['diff_default_state_' . $entity_type]);
+  $config->save();
+  backdrop_set_message(t('The configuration options have been saved.'));
+}
+
 
 /**
  * Menu callback - provides an overview of Diff support and global settings.
@@ -156,18 +199,18 @@ function diff_admin_global_field_settings($form, $form_state, $type) {
 
   $field_types = field_info_field_types();
   if (!isset($field_types[$type])) {
-    drupal_set_message(t('Invalid field type.'), 'error');
-    drupal_goto('admin/config/content/diff/fields');
+    backdrop_set_message(t('Invalid field type.'), 'error');
+    backdrop_goto('admin/config/content/diff/fields');
   }
   $field_type = $field_types[$type];
 
   // Set the title to give more context to this page.
-  drupal_set_title(t('Global settings for %label fields', array(
+  backdrop_set_title(t('Global settings for %label fields', array(
     '%label' => $field_type['label'],
   )), PASS_THROUGH);
 
   $variable_name = "diff_{$field_type['module']}_field_{$type}_default_options";
-  $settings = variable_get($variable_name, array());
+  $settings = config_get('diff.settings',$variable_name);
   $settings = _diff_field_default_settings($field_type['module'], $type, $settings);
   $func = $field_type['module'] . '_field_diff_options_form';
   if (function_exists($func) && ($options_form = $func($type, $settings))) {
@@ -176,5 +219,24 @@ function diff_admin_global_field_settings($form, $form_state, $type) {
   $form[$variable_name]['#tree'] = TRUE;
 
   diff_global_settings_form($form[$variable_name], $form_state, $type, $settings);
-  return system_settings_form($form);
+
+
+  // Add a submit button
+  $form['actions']['#type'] = 'actions';
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save configuration'),
+  );
+
+  return $form;
+}
+
+/**
+ * Submit handler for global_field_settings_form().
+ */
+function diff_admin_global_field_settings_submit($form, &$form_state){
+  $config = config('diff.settings');
+
+  $config->save();
+  backdrop_set_message(t('The configuration options have been saved.'));
 }

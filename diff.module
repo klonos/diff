@@ -114,7 +114,7 @@ function diff_menu() {
     'title' => 'Diff',
     'description' => 'Diff settings.',
     'file' => 'diff.admin.inc',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('diff_admin_settings'),
     'access arguments' => array('administer site configuration'),
   );
@@ -133,7 +133,7 @@ function diff_menu() {
   );
   $items['admin/config/content/diff/fields/%'] = array(
     'title' => 'Global field settings',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('diff_admin_global_field_settings', 5),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_VISIBLE_IN_BREADCRUMB,
@@ -144,7 +144,7 @@ function diff_menu() {
     'title' => 'Entities',
     'description' => 'Entity settings.',
     'file' => 'diff.admin.inc',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('diff_admin_global_entity_settings', 'node'),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_LOCAL_TASK,
@@ -160,7 +160,7 @@ function diff_menu() {
     'title' => 'Users',
     'description' => 'User diff settings.',
     'file' => 'diff.admin.inc',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('diff_admin_global_entity_settings', 'user'),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_LOCAL_TASK,
@@ -299,7 +299,7 @@ function diff_block_view($delta) {
       $revisions = node_revision_list($node);
       if (count($revisions) > 1) {
         $block['subject'] = t('Highlight changes');
-        $block['content'] = drupal_get_form('diff_inline_form', $node, $revisions);
+        $block['content'] = backdrop_get_form('diff_inline_form', $node, $revisions);
       }
       return $block;
     }
@@ -510,7 +510,7 @@ function diff_get_rows($a, $b, $show_header = FALSE, &$line_stats = NULL) {
       'offset' => array('x' => 0, 'y' => 0),
     );
   }
-  $formatter = new DrupalDiffFormatter();
+  $formatter = new BackdropDiffFormatter();
   // Header is the line counter.
   $formatter->show_header = $show_header;
   $formatter->line_stats = &$line_stats;
@@ -530,7 +530,7 @@ function diff_get_rows($a, $b, $show_header = FALSE, &$line_stats = NULL) {
  *   String containing HTML markup.
  */
 function diff_get_inline($a, $b) {
-  $diff = new DrupalDiffInline($a, $b);
+  $diff = new BackdropDiffInline($a, $b);
   return $diff->render();
 }
 
@@ -615,13 +615,13 @@ function diff_build_attachments($jscript = FALSE) {
   $theme = variable_get('diff_theme', 'default');
   if ($theme) {
     $attachments['css'] = array(
-      drupal_get_path('module', 'diff') . "/css/diff.{$theme}.css",
+      backdrop_get_path('module', 'diff') . "/css/diff.{$theme}.css",
     );
   }
   $type = variable_get('diff_radio_behavior', 'simple');
   if ($jscript && $type) {
     $attachments['js'] = array(
-      drupal_get_path('module', 'diff') . "/js/diff.js",
+      backdrop_get_path('module', 'diff') . "/js/diff.js",
       array(
         'data' => array('diffRevisionRadios' => $type),
         'type' => 'setting',
@@ -707,4 +707,17 @@ function user_entity_diff_options($entity_type) {
     );
     return $options;
   }
+}
+
+
+
+/**
+ * Implements hook_config_info().
+ */
+function diff_config_info() {
+  $prefixes['diff.settings'] = array(
+    'label' => t('Diff'),
+    'group' => t('Configuration'),
+  );
+  return $prefixes;
 }

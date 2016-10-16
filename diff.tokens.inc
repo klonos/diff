@@ -51,7 +51,7 @@ function diff_tokens($type, $tokens, array $data = array(), array $options = arr
             unset($build['diff_table']['#rows']['navigation']);
             unset($build['diff_preview']);
 
-            $output = drupal_render_children($build);
+            $output = backdrop_render_children($build);
             $replacements[$original] = $sanitize ? check_plain($output) : $output;
           }
           break;

@@ -78,7 +78,7 @@ function text_field_diff_default_options($field_type) {
   // Overrides the global 'markdown' setting which does not escape HTML.
   $settings = array(
     'compare_format' => 0,
-    'markdown' => 'drupal_html_to_text',
+    'markdown' => 'backdrop_html_to_text',
     'line_counter' => '',
   );
   if ($field_type == 'text_with_summary') {

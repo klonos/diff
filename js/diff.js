@@ -1,6 +1,6 @@
 (function ($) {
 
-Drupal.behaviors.diffRevisions = {
+Backdrop.behaviors.diffRevisions = {
   attach: function (context, settings) {
     var $rows = $('table.diff-revisions tbody tr');
     function updateDiffRadios() {
@@ -29,7 +29,7 @@ Drupal.behaviors.diffRevisions = {
           $oldRadio.css('visibility', 'hidden');
           $newRadio.css('visibility', 'visible');
         } else {
-          if (Drupal.settings.diffRevisionRadios == 'linear') {
+          if (Backdrop.settings.diffRevisionRadios == 'linear') {
             if (newTd && oldTd) {
               $oldRadio.css('visibility', 'visible');
               $newRadio.css('visibility', 'hidden');
@@ -48,7 +48,7 @@ Drupal.behaviors.diffRevisions = {
       });
       return true;
     }
-    if (Drupal.settings.diffRevisionRadios) {
+    if (Backdrop.settings.diffRevisionRadios) {
       $rows.find('input[name="new"], input[name="old"]').click(updateDiffRadios);
       updateDiffRadios();
     }
