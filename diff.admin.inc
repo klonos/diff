@@ -137,7 +137,7 @@ function diff_admin_global_entity_settings($form, $form_state, $entity_type) {
  */
 function diff_admin_global_entity_settings_submit($form, &$form_state){
   $config = config('diff.settings');
-  $entity_type = 1;
+  $entity_type = $form_state['build_info']['args'][0];
   $config->set('diff_additional_options_' . $entity_type, $form_state['values']['diff_additional_options_' . $entity_type]);
   $config->set('diff_show_header_' . $entity_type, $form_state['values']['diff_show_header_' . $entity_type]);
   $config->set('diff_admin_path_' . $entity_type, $form_state['values']['diff_admin_path_' . $entity_type]);
