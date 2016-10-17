@@ -235,8 +235,15 @@ function diff_admin_global_field_settings($form, $form_state, $type) {
  * Submit handler for global_field_settings_form().
  */
 function diff_admin_global_field_settings_submit($form, &$form_state){
-  $config = config('diff.settings');
 
+  form_state_values_clean($form_state);
+	$config = config('diff.settings');
+  foreach ($form_state['values'] as $key => $value) {
+    if (is_array($value) && isset($form_state['values']['array_filter'])) {
+      $value = array_keys(array_filter($value));
+    }
+    $config->set($key, $value);
+  }
   $config->save();
   backdrop_set_message(t('The configuration options have been saved.'));
 }
