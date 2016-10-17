@@ -67,7 +67,7 @@ function diff_entity_fields_diff($old_entity, $new_entity, $context, $default_la
   $field_context = $context;
 
   $actual_mode = FALSE;
-  list(,, $bundle_name) = entity_extract_ids($entity_type, $new_entity);
+  list(, , $bundle_name) = entity_extract_ids($entity_type, $new_entity);
   $instances = field_info_instances($entity_type, $bundle_name);
 
   // Some fields piggy back the display settings, so we need to fake these by
@@ -203,14 +203,14 @@ function diff_entity_fields_diff($old_entity, $new_entity, $context, $default_la
  */
 function diff_field_diff_view($items, $context) {
   $diff_items = array();
-   $entity = clone $context['entity'];
-   $langcode = field_language($context['entity_type'], $entity, $context['field']['field_name']);
-   $view_mode = empty($context['view_mode']) ? 'diff_standard' : $context['view_mode'];
-   $element = field_view_field($context['entity_type'], $entity, $context['field']['field_name'], $view_mode, $langcode);
+  $entity = clone $context['entity'];
+  $langcode = field_language($context['entity_type'], $entity, $context['field']['field_name']);
+  $view_mode = empty($context['view_mode']) ? 'diff_standard' : $context['view_mode'];
+  $element = field_view_field($context['entity_type'], $entity, $context['field']['field_name'], $view_mode, $langcode);
 
-   foreach (element_children($element) as $delta) {
-     $diff_items[$delta] = backdrop_render($element[$delta]);
-   }
+  foreach (element_children($element) as $delta) {
+    $diff_items[$delta] = backdrop_render($element[$delta]);
+  }
   return $diff_items;
 }
 
@@ -309,7 +309,9 @@ DiffFormatter and Diff classes. Diff 8.x-4.x maybe.
 function _diff_field_default_settings($module, $field_type, $settings = array()) {
   // Load files containing the field callbacks.
   _diff_autoload($module);
-
+  if (!isset($settings)) {
+    $settings = array();
+  }
   // Populate any missing values from CALLBACK_field_diff_default_options().
   $func = $module . '_field_diff_default_options';
   if (function_exists($func)) {
