@@ -309,7 +309,7 @@ DiffFormatter and Diff classes. Diff 8.x-4.x maybe.
 function _diff_field_default_settings($module, $field_type, $settings = array()) {
   // Load files containing the field callbacks.
   _diff_autoload($module);
-
+  if (!isset($settings)){$settings = array();}
   // Populate any missing values from CALLBACK_field_diff_default_options().
   $func = $module . '_field_diff_default_options';
   if (function_exists($func)) {
