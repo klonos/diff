@@ -162,7 +162,7 @@ function diff_diffs_show($node, $old_vid, $new_vid, $state = NULL) {
   // Attaches the CSS.
   $build['#attached'] = diff_build_attachments();
 
-  $default_state = variable_get('diff_default_state_node', 'raw');
+  $default_state = config_get('diff.settings','diff_default_state_node');
   if (empty($state)) {
     $state = $default_state;
   }
@@ -272,7 +272,7 @@ function diff_diffs_show($node, $old_vid, $new_vid, $state = NULL) {
   );
 
   // Allow users to hide or set the display mode of the preview.
-  if (node_is_page($node) && $view_mode = variable_get('diff_view_mode_preview_node_' . $new_node->type, 'full')) {
+  if (node_is_page($node) && $view_mode = config_get('diff.settings','diff_view_mode_preview_node_' . $new_node->type)) {
     $header = '';
     if ($node->vid == $new_vid) {
       $header .= '<div class="diff-section-title">' . t('Current revision:') . '</div>';
@@ -307,7 +307,7 @@ function diff_entity_body_rows($entity_type, $left_entity, $right_entity, $conte
   // This is an unique index only, so no need for backdrop_static().
   static $table_row_counter = 0;
 
-  if ($theme = variable_get('diff_theme', 'default')) {
+  if ($theme = config_get('diff.settings','diff_theme')) {
     backdrop_add_css(backdrop_get_path('module', 'diff') . "/css/diff.{$theme}.css");
   }
 

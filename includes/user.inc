@@ -17,7 +17,7 @@ function _user_entity_diff_additional_options_name($old_user, $new_user, $contex
     '#states' => array(),
     '#weight' => -5,
     '#settings' => array(
-      'show_header' => variable_get('diff_show_header_user', 1),
+      'show_header' => config_get('diff.settings','diff_show_header_user'),
     ),
   );
   foreach ($context['states'] as $state) {

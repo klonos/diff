@@ -100,7 +100,7 @@ function theme_diff_empty_line($vars) {
  * Theme function for inline diff form.
  */
 function theme_diff_inline_form($vars) {
-  if ($theme = variable_get('diff_theme', 'default')) {
+  if ($theme = config_get('diff.settings','diff_theme')) {
     backdrop_add_css(backdrop_get_path('module', 'diff') . "/css/diff.{$theme}.css");
   }
   return backdrop_render_children($vars['form']);
@@ -110,7 +110,7 @@ function theme_diff_inline_form($vars) {
  * Display inline diff metadata.
  */
 function theme_diff_inline_metadata($vars) {
-  if ($theme = variable_get('diff_theme', 'default')) {
+  if ($theme = config_get('diff.settings','diff_theme')) {
     backdrop_add_css(backdrop_get_path('module', 'diff') . "/css/diff.{$theme}.css");
   }
   $node = $vars['node'];

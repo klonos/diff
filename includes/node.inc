@@ -15,7 +15,7 @@ function _node_entity_diff_additional_options_title($old_node, $new_node, $conte
     '#states' => array(),
     '#weight' => -5,
     '#settings' => array(
-      'show_header' => variable_get('diff_show_header_node', 1),
+      'show_header' => config_get('diff.settings','diff_show_header_node'),
     ),
   );
   foreach ($context['states'] as $state) {

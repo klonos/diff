@@ -19,15 +19,6 @@ function diff_uninstall() {
       ->execute();
   }
 
-  // Delete global variables.
-  variable_del('diff_context_lines_trailing');
-  variable_del('diff_context_lines_leading');
-  variable_del('diff_theme');
-  variable_del('diff_radio_behavior', '');
-
-  foreach (field_info_fields() as $field) {
-    variable_del("diff_{$field['module']}_field_{$field['type']}_default_options");
-  }
 }
 
 

@@ -1101,8 +1101,8 @@ class BackdropDiffFormatter extends DiffFormatter {
   );
 
   function __construct() {
-    $this->leading_context_lines = variable_get('diff_context_lines_leading', 2);
-    $this->trailing_context_lines = variable_get('diff_context_lines_trailing', 2);
+    $this->leading_context_lines = config_get('diff.settings','diff_context_lines_leading');
+    $this->trailing_context_lines = config_get('diff.settings','diff_context_lines_trailing');
   }
 
   function _start_diff() {

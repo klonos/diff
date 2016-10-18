@@ -193,7 +193,7 @@ function diff_menu_alter(&$callbacks) {
  */
 function diff_admin_paths_alter(&$paths) {
   // By default, treat all diff pages as administrative.
-  if (variable_get('diff_admin_path_node', 1)) {
+  if (config_get('diff.settings','diff_admin_path_node')) {
     $paths['node/*/revisions/view/*/*'] = TRUE;
   }
 }
@@ -202,7 +202,7 @@ function diff_admin_paths_alter(&$paths) {
  * Access callback for the node revisions page.
  */
 function diff_node_revision_access($node, $op = 'view') {
-  $may_revision_this_type = variable_get('diff_enable_revisions_page_node_' . $node->type, TRUE) || user_access('administer nodes');
+  $may_revision_this_type = config_get('diff.settings','diff_enable_revisions_page_node_' . $node->type) || user_access('administer nodes');
   return $may_revision_this_type && _node_revision_access($node, $op);
 }
 
@@ -268,7 +268,7 @@ function diff_block_configure($delta = '') {
       $form['bundles'] = array(
         '#type' => 'checkboxes',
         '#title' => t('Enabled content types'),
-        '#default_value' => variable_get('diff_show_diff_inline_node_bundles', array()),
+        '#default_value' => config_get('diff.settings','diff_show_diff_inline_node_bundles'),
         '#options' => node_type_get_names(),
         '#description' => t('Show this block only on pages that display content of the given type(s).'),
       );
@@ -283,7 +283,7 @@ function diff_block_configure($delta = '') {
 function diff_block_save($delta = '', $edit = array()) {
   switch ($delta) {
     case 'inline':
-      variable_set('diff_show_diff_inline_node_bundles', $edit['bundles']);
+      config_set('diff.settings','diff_show_diff_inline_node_bundles', $edit['bundles']);
       break;
   }
 }
@@ -293,7 +293,7 @@ function diff_block_save($delta = '', $edit = array()) {
  */
 function diff_block_view($delta) {
   if ($delta === 'inline' && user_access('view revisions') && ($node = menu_get_object()) && arg(2) !== 'edit') {
-    $enabled_types = variable_get('diff_show_diff_inline_node_bundles', array());
+    $enabled_types = config_get('diff.settings','diff_show_diff_inline_node_bundles');
     if (!empty($enabled_types[$node->type])) {
       $block = array();
       $revisions = node_revision_list($node);
@@ -311,7 +311,7 @@ function diff_block_view($delta) {
  */
 function diff_node_view_alter(&$build) {
   $node = $build['#node'];
-  if (user_access('view revisions') && in_array($node->type, variable_get('diff_show_diff_inline_node_bundles', array()), TRUE)) {
+  if (user_access('view revisions') && in_array($node->type, config_get('diff.settings','diff_show_diff_inline_node_bundles'), TRUE)) {
     // Ugly but cheap way to check that we are viewing a node's revision page.
     if (arg(2) === 'revisions' && arg(3) === $node->vid) {
       module_load_include('inc', 'diff', 'diff.pages');
@@ -329,7 +329,7 @@ function diff_node_view_alter(&$build) {
 function diff_form_node_form_alter(&$form, $form_state) {
   // Add a 'View changes' button on the node edit form.
   $node = $form['#node'];
-  if (variable_get('diff_show_preview_changes_node_' . $node->type, TRUE) && !empty($node->nid)) {
+  if (config_get('diff.settings','diff_show_preview_changes_node_' . $node->type) && !empty($node->nid)) {
     $form['actions']['preview_changes'] = array(
       '#type' => 'submit',
       '#value' => t('View changes'),
@@ -355,13 +355,13 @@ function diff_form_node_type_form_alter(&$form, $form_state) {
       '#type' => 'checkbox',
       '#title' => t('Show <em>View changes</em> button on node edit form'),
       '#weight' => 10,
-      '#default_value' => variable_get('diff_show_preview_changes_node_' . $type->type, TRUE),
+      '#default_value' => config_get('diff.settings','diff_show_preview_changes_node_' . $type->type),
     );
     $form['diff']['diff_enable_revisions_page_node'] = array(
       '#type' => 'checkbox',
       '#title' => t('Enable the <em>Revisions</em> page for this content type'),
       '#weight' => 11,
-      '#default_value' => variable_get('diff_enable_revisions_page_node_' . $type->type, TRUE),
+      '#default_value' => config_get('diff.settings','diff_enable_revisions_page_node_' . $type->type),
     );
     $options = array();
     $info = entity_get_info('node');
@@ -374,7 +374,7 @@ function diff_form_node_type_form_alter(&$form, $form_state) {
       '#description' => t('Governs the <em>Current revision</em> view mode when doing standard comparisons.'),
       '#options' => $options,
       '#weight' => 13,
-      '#default_value' => variable_get('diff_view_mode_preview_node_' . $type->type, 'full'),
+      '#default_value' => config_get('diff.settings','diff_view_mode_preview_node_' . $type->type),
       '#empty_value' => '',
       '#empty_option' => t('- Do not display -'),
     );
@@ -394,21 +394,21 @@ function diff_node_type_update($info) {
       'diff_view_mode_preview_node',
     );
     foreach ($type_variables as $prefix) {
-      $setting = variable_get($prefix . '_' . $info->old_type, NULL);
+      $setting = config_get('diff.settings',$prefix . '_' . $info->old_type);
       if (isset($setting)) {
-        variable_del($prefix . '_' . $info->old_type);
-        variable_set($prefix . '_' . $info->type, $setting);
+        config_set('diff.settings',$prefix . '_' . $info->old_type,'');
+        config_set('diff.settings',$prefix . '_' . $info->type, $setting);
       }
     }
 
     // Block settings are combined in a single variable.
-    $inline_block_types = variable_get('diff_show_diff_inline_node_bundles', array());
+    $inline_block_types = config_get('diff.settings','diff_show_diff_inline_node_bundles');
     if (isset($inline_block_types[$info->old_type])) {
       if (!empty($inline_block_types[$info->old_type])) {
         $inline_block_types[$info->type] = $info->type;
       }
       unset($inline_block_types[$info->old_type]);
-      variable_set('diff_show_diff_inline_node_bundles', $inline_block_types);
+      config_set('diff.settings','diff_show_diff_inline_node_bundles', $inline_block_types);
     }
   }
 }
@@ -417,9 +417,9 @@ function diff_node_type_update($info) {
  * Implements hook_node_type_delete().
  */
 function diff_node_type_delete($info) {
-  variable_del('diff_show_preview_changes_node_' . $info->type);
-  variable_del('diff_enable_revisions_page_node_' . $info->type);
-  variable_del('diff_view_mode_preview_node_' . $info->type);
+  config_set('diff.settings','diff_show_preview_changes_node_' . $info->type,'');
+  config_set('diff.settings','diff_enable_revisions_page_node_' . $info->type,'');
+  config_set('diff.settings','diff_view_mode_preview_node_' . $info->type,'');
 }
 
 /**
@@ -612,13 +612,13 @@ function diff_filter_xss($string) {
  */
 function diff_build_attachments($jscript = FALSE) {
   $attachments = array();
-  $theme = variable_get('diff_theme', 'default');
+  $theme = config_get('diff.settings','diff_theme');
   if ($theme) {
     $attachments['css'] = array(
       backdrop_get_path('module', 'diff') . "/css/diff.{$theme}.css",
     );
   }
-  $type = variable_get('diff_radio_behavior', 'simple');
+  $type = config_get('diff.settings','diff_radio_behavior');
   if ($jscript && $type) {
     $attachments['js'] = array(
       backdrop_get_path('module', 'diff') . "/js/diff.js",
@@ -638,7 +638,7 @@ function node_entity_diff($old_node, $new_node, $context) {
   $result = array();
   if ($context['entity_type'] == 'node') {
     module_load_include('inc', 'diff', 'includes/node');
-    $options = variable_get('diff_additional_options_node', array('title' => 'title'));
+    $options = config_get('diff.settings','diff_additional_options_node');
     foreach (node_entity_diff_options('node') as $key => $option_label) {
       if (!empty($options[$key])) {
         $func = '_node_entity_diff_additional_options_' . $key;
@@ -681,7 +681,7 @@ function user_entity_diff($old_user, $new_user, $context) {
   $result = array();
   if ($context['entity_type'] == 'user') {
     module_load_include('inc', 'diff', 'includes/user');
-    $options = variable_get('diff_additional_options_user', array('name' => 'name', 'mail' => 'mail', 'status' => 'status'));
+    $options = config_get('diff.settings','diff_additional_options_user');
     foreach (user_entity_diff_options('user') as $key => $option_label) {
       if (!empty($options[$key])) {
         $func = '_user_entity_diff_additional_options_' . $key;
