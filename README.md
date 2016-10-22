@@ -2,7 +2,7 @@
 
 The diff module is used to show differences between content revisions.
 
-This port to Backdrop is work in progress.
+This port to Backdrop requires more testing.
 
 This is a port from the Drupal module of the same name. 
 
