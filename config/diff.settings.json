@@ -8,20 +8,6 @@
   "diff_default_state_node": "raw",
   "diff_show_header_node": "1",
   "diff_show_header_user": "1",
-  // settings per entity type
-  "diff_additional_options_": "",
-  "diff_show_header_": "",
-  "diff_admin_path_": "",
-  "diff_default_state_": "",
-  // settings per node type
-  "diff_show_diff_inline_node_": "",
-  "diff_enable_revisions_page_node_": "",
-  "diff_show_preview_changes_node_": "",
-  "diff_view_mode_preview_node_": "",
-  // settings that are arrays
-  "diff_show_diff_inline_node_bundles": "",
-  "diff_additional_options_node": "",
-  "diff_additional_options_user": ""
+  "diff_admin_path_user": 0,
+  "diff_default_state_user": ""
 }
-
-
