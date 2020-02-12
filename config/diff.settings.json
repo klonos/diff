@@ -9,5 +9,7 @@
   "diff_show_header_node": "1",
   "diff_show_header_user": "1",
   "diff_admin_path_user": 0,
-  "diff_default_state_user": ""
+  "diff_default_state_user": "",
+  "diff_show_diff_inline_node_bundles" : [],
+  "diff_additional_options_node": []
 }
