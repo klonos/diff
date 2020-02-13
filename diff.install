@@ -4,21 +4,7 @@
  * Implements hook_uninstall().
  */
 function diff_uninstall() {
-  // Bulk delete entity based variables.
-  $prefixes = array(
-    'diff_enable_revisions_page_',
-    'diff_show_',
-    'diff_view_mode_',
-    'diff_admin_path_',
-    'diff_default_state_',
-    'diff_additional_options_'
-  );
-  foreach ($prefixes as $prefix) {
-    db_delete('variable')
-      ->condition('name', db_like($prefix) . '%', 'LIKE')
-      ->execute();
-  }
-
+  
 }
 
 
