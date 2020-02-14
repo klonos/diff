@@ -166,7 +166,9 @@ function diff_node_revisions_validate($form, &$form_state) {
 function diff_diffs_show($node, $old_vid, $new_vid, $state = NULL) {
   // Attaches the CSS.
   $build['#attached'] = diff_build_attachments();
-
+  $build['info'] = array(
+    '#markup' => t('<strong>Comparing two revisions:</strong>'),
+  );
   $default_state = config_get('diff.settings','diff_default_state_node');
   if (empty($state)) {
     $state = $default_state;
