@@ -37,6 +37,11 @@ function diff_node_revisions($form, $form_state, $node) {
     '#type' => 'hidden',
     '#value' => $node->nid,
   );
+  
+  $form['help'] = array(
+    '#type' => 'help',
+    '#markup' => t('Revisions allow you to track differences between multiple versions of your content, and revert back to older versions.'),
+  );
 
   $revision_list = node_revision_list($node);
 
