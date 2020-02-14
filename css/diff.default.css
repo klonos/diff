@@ -88,3 +88,16 @@ table.diff td {
 table.diff-revisions tr.revision-published td {
   background-color: #aaffaa;
 }
+table.diff-revisions input.form-submit {
+  color: #fff;
+  background-color: #1766ae;
+  margin-top: 10px;
+}
+table.diff-revisions input.form-submit:hover {
+  background-color: #114a75;
+}
+table.diff-revisions th {
+  border-width: 1px;
+  border-style: solid;
+  border-color: #bebfb9;
+}
