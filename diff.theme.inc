@@ -11,6 +11,9 @@
 function theme_diff_node_revisions($vars) {
   $form = $vars['form'];
   $output = '';
+  if (isset($form['help'])) {
+    $output = backdrop_render($form['help']);
+  }
 
   // Overview table:
   $header = array(
