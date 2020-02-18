@@ -186,7 +186,7 @@ function diff_admin_paths_alter(&$paths) {
  * Access callback for the node revisions page.
  */
 function diff_node_revision_access($node, $op = 'view') {
-  $may_revision_this_type = config_get('diff.settings', 'diff_enable_revisions_page_node_' . $node->type) || user_access('administer nodes');
+  $may_revision_this_type = config_get('diff.settings', 'diff_enable_revisions_page_node_' . $node->type) || user_access('view revisions');
   return $may_revision_this_type && _node_revision_access($node, $op);
 }
 
