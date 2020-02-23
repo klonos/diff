@@ -37,7 +37,7 @@ function diff_node_revisions($form, $form_state, $node) {
     '#type' => 'hidden',
     '#value' => $node->nid,
   );
-  
+
   $form['help'] = array(
     '#type' => 'help',
     '#markup' => t('Revisions allow you to track differences between multiple versions of your content, and revert back to older versions.'),
@@ -279,7 +279,7 @@ function diff_diffs_show($node, $old_vid, $new_vid, $state = NULL) {
   );
 
   // Allow users to hide or set the display mode of the preview.
-  if (node_is_page($node) && $view_mode = config_get('diff.settings','diff_view_mode_preview_node_' . $new_node->type)) {
+  if (node_is_page($node) && $view_mode = config_get("node.type.$new_node->type",'settings.diff_view_mode_preview_node')) {
     $header = '';
     if ($node->vid == $new_vid) {
       $header .= '<div class="diff-section-title">' . t('Current revision:') . '</div>';

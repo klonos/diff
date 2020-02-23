@@ -177,7 +177,7 @@ function diff_menu_alter(&$callbacks) {
  */
 function diff_admin_paths_alter(&$paths) {
   // By default, treat all diff pages as administrative.
-  if (config_get('diff.settings', 'diff_admin_path_node')) {
+  if (config_get('diff.settings', 'diff_admin_path . node')) {
     $paths['node/*/revisions/view/*/*'] = TRUE;
   }
 }
@@ -186,7 +186,8 @@ function diff_admin_paths_alter(&$paths) {
  * Access callback for the node revisions page.
  */
 function diff_node_revision_access($node, $op = 'view') {
-  $may_revision_this_type = config_get('diff.settings', 'diff_enable_revisions_page_node_' . $node->type) || user_access('view revisions');
+  $may_revision_this_type = config_get("node.type.$node->type", 'settings.diff_enable_revisions_page_node') || user_access('view revisions');
+  $account = $GLOBALS['user'];
   return $may_revision_this_type && _node_revision_access($node, $op);
 }
 
@@ -238,6 +239,7 @@ function diff_block_info() {
   return array(
     'inline' => array(
       'info' => t('Inline differences'),
+      'description' => t('Display recent revisions on this page.'),
     ),
   );
 }
@@ -313,7 +315,7 @@ function diff_node_view_alter(&$build) {
 function diff_form_node_form_alter(&$form, $form_state) {
   // Add a 'View changes' button on the node edit form.
   $node = $form['#node'];
-  if (config_get('diff.settings', 'diff_show_preview_changes_node_' . $node->type) && !empty($node->nid)) {
+  if (config_get("node.type.$node->type", 'settings.diff_show_preview_changes_node') && !empty($node->nid)) {
     $form['actions']['preview_changes'] = array(
       '#type' => 'submit',
       '#value' => t('View changes'),
@@ -329,16 +331,16 @@ function diff_form_node_form_alter(&$form, $form_state) {
 function diff_form_node_type_form_alter(&$form, $form_state) {
   if (isset($form['type'])) {
     $type = $form['#node_type'];
-    $thistype = $type->type;
-    $settings = $type->settings;
-    if (!isset($settings['diff_show_preview_changes_node'])) {
-      // need new config settings
-      $config = config("node.type.$thistype");
-      $config->set('settings.diff_show_preview_changes_node', 0);
-      $config->set('settings.diff_enable_revisions_page_node', 0);
-      $config->set('settings.diff_view_mode_preview_node', ' ');
-      $config->save();
+
+    // Add to the settings for this type of node if none set.
+    if (!isset($type->settings['diff_show_preview_changes_node'])) {
+      $type->settings['diff_show_preview_changes_node'] = 0;
+      $type->settings['diff_enable_revisions_page_node'] = 0;
+      $type->settings['diff_view_mode_preview_node'] = ' ';
     }
+
+    $settings = $type->settings;
+
     $form['diff'] = array(
       '#title' => t('Compare revisions'),
       '#type' => 'fieldset',
@@ -387,11 +389,12 @@ function diff_node_type_update($info) {
       'diff_enable_revisions_page_node',
       'diff_view_mode_preview_node',
     );
-    foreach ($type_variables as $prefix) {
-      $setting = config_get('diff.settings', $prefix . '_' . $info->old_type);
+    foreach ($type_variables as $suffix) {
+      $old_filename = 'node.type.' . $info->old_type;
+      $new_filename = 'node.type.' . $info->type;
+      $setting = config_get($old_filename, "settings.$suffix");
       if (isset($setting)) {
-        config_set('diff.settings', $prefix . '_' . $info->old_type, '');
-        config_set('diff.settings', $prefix . '_' . $info->type, $setting);
+        config_set($new_filename, "settings.$suffix", $setting);
       }
     }
 
@@ -411,6 +414,8 @@ function diff_node_type_update($info) {
  * Implements hook_node_type_delete().
  */
 function diff_node_type_delete($info) {
+  $node_type = $info->type;
+  config_clear('diff.settings',"diff_show_diff_inline_node_bundles.$node_type");
 }
 
 /**
@@ -548,7 +553,7 @@ function diff_inline_form($form, $form_state, $node, $revisions) {
   foreach ($revisions as $revision) {
     $form['revision']['#options'][$revision->vid] = t('@revision by @name', array(
       '@revision' => format_date($revision->timestamp, 'short'),
-      '@name' => user_format_name($revision),
+      '@name' => format_username($revision),
     ));
   }
   $form['submit'] = array(
@@ -630,7 +635,7 @@ function node_entity_diff($old_node, $new_node, $context) {
   $result = array();
   if ($context['entity_type'] == 'node') {
     module_load_include('inc', 'diff', 'includes/node');
-    $options = config_get('diff.settings', 'diff_additional_options_node');
+    $options = config_get('diff.settings', 'diff_additional_options.node');
     foreach (node_entity_diff_options('node') as $key => $option_label) {
       if (!empty($options[$key])) {
         $func = '_node_entity_diff_additional_options_' . $key;
@@ -673,7 +678,7 @@ function user_entity_diff($old_user, $new_user, $context) {
   $result = array();
   if ($context['entity_type'] == 'user') {
     module_load_include('inc', 'diff', 'includes/user');
-    $options = config_get('diff.settings', 'diff_additional_options_user');
+    $options = config_get('diff.settings', 'diff_additional_options.user');
     foreach (user_entity_diff_options('user') as $key => $option_label) {
       if (!empty($options[$key])) {
         $func = '_user_entity_diff_additional_options_' . $key;
@@ -733,3 +738,4 @@ function diff_autoload_info()
     '_HWLDF_WordAccumulator' => 'DiffEngine.php',
   );
 }
+

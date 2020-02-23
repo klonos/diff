@@ -6,7 +6,7 @@
  */
 
 /**
- * Theme function to display the revisions formular.
+ * Theme function to display the revisions form.
  */
 function theme_diff_node_revisions($vars) {
   $form = $vars['form'];

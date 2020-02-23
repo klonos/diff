@@ -8,7 +8,18 @@
 /**
  * General configuration form for controlling the diff behaviour.
  */
+
 function diff_admin_settings($form, $form_state) {
+  $help_markup = t('The Diff module replaces the normal <em>Revisions</em> node tab.');
+  $help_markup .= t(' Diff enhances the listing of revisions with an option to view the differences between any two content revisions.');
+  $help_markup .= t(' Access to this feature is controlled with the <em>View revisions</em> permission.');
+  $help_markup .= t(' The feature can be enabled/disabled with <em>Compare revisions</em> settings available on the configuration page for each content type.');
+  $help_markup .= t(' Diff also provides an optional <em>View changes</em> button while editing a node.');
+
+  $form['help'] = array(
+    '#type' => 'help',
+    '#markup' => $help_markup,
+  );
   $form['diff_theme'] = array(
     '#type' => 'select',
     '#title' => t('CSS options'),
@@ -82,7 +93,7 @@ function diff_admin_global_entity_settings($form, $form_state, $entity_type) {
     $form['diff_additional_options_' . $entity_type] = array(
       '#type' => 'checkboxes',
       '#title' => t('Property options'),
-      '#default_value' => config_get('diff.settings','diff_additional_options_' . $entity_type),
+      '#default_value' => config_get('diff.settings',"diff_additional_options.$entity_type"),
       '#options' => $options,
     );
   }
@@ -96,7 +107,7 @@ function diff_admin_global_entity_settings($form, $form_state, $entity_type) {
   $form['diff_show_header_' . $entity_type] = array(
     '#type' => 'checkbox',
     '#title' => t('Show entity label row header'),
-    '#default_value' => config_get('diff.settings','diff_show_header_' . $entity_type),
+    '#default_value' => config_get('diff.settings',"diff_show_header.$entity_type"),
   );
   if (user_access('administer permissions')) {
     $admin_link = l(t('View the administration theme'), 'admin/people/permissions', array('fragment' => 'edit-view-the-administration-theme'));
@@ -108,12 +119,12 @@ function diff_admin_global_entity_settings($form, $form_state, $entity_type) {
     '#type' => 'checkbox',
     '#title' => t('Use administration theme'),
     '#description' => t('This option will enable users with the <em>!link</em> permission to use the admin theme when doing comparisons.', array('!link' => $admin_link)),
-    '#default_value' => config_get('diff.settings','diff_admin_path_' . $entity_type),
+    '#default_value' => config_get('diff.settings',"diff_admin_path.$entity_type"),
   );
   $form['diff_default_state_' . $entity_type] = array(
     '#type' => 'select',
     '#title' => t('Diff default state'),
-    '#default_value' => config_get('diff.settings','diff_default_state_' . $entity_type),
+    '#default_value' => config_get('diff.settings',"diff_default_state.$entity_type"),
     '#options' => array(
       'raw' => t('HTML view'),
       'raw_plain' => t('Plain view'),
@@ -138,10 +149,10 @@ function diff_admin_global_entity_settings($form, $form_state, $entity_type) {
 function diff_admin_global_entity_settings_submit($form, &$form_state){
   $config = config('diff.settings');
   $entity_type = $form_state['build_info']['args'][0];
-  $config->set('diff_additional_options_' . $entity_type, $form_state['values']['diff_additional_options_' . $entity_type]);
-  $config->set('diff_show_header_' . $entity_type, $form_state['values']['diff_show_header_' . $entity_type]);
-  $config->set('diff_admin_path_' . $entity_type, $form_state['values']['diff_admin_path_' . $entity_type]);
-  $config->set('diff_default_state_' . $entity_type, $form_state['values']['diff_default_state_' . $entity_type]);
+  $config->set("diff_additional_options.$entity_type", $form_state['values']['diff_additional_options_' . $entity_type]);
+  $config->set("diff_show_header.$entity_type", $form_state['values']['diff_show_header_' . $entity_type]);
+  $config->set("diff_admin_path.$entity_type", $form_state['values']['diff_admin_path_' . $entity_type]);
+  $config->set("diff_default_state.$entity_type", $form_state['values']['diff_default_state_' . $entity_type]);
   $config->save();
   backdrop_set_message(t('The configuration options have been saved.'));
 }
@@ -210,7 +221,9 @@ function diff_admin_global_field_settings($form, $form_state, $type) {
   )), PASS_THROUGH);
 
   $variable_name = "diff_{$field_type['module']}_field_{$type}_default_options";
-  $settings = config_get('diff.settings',$variable_name);
+  $setting_name = substr($variable_name, 5);
+  $setting_name = substr($setting_name, 0,- 16);
+  $settings = config_get('diff.settings', "diff_field_default_options.$setting_name");
   $settings = _diff_field_default_settings($field_type['module'], $type, $settings);
   $func = $field_type['module'] . '_field_diff_options_form';
   if (function_exists($func) && ($options_form = $func($type, $settings))) {
@@ -219,7 +232,6 @@ function diff_admin_global_field_settings($form, $form_state, $type) {
   $form[$variable_name]['#tree'] = TRUE;
 
   diff_global_settings_form($form[$variable_name], $form_state, $type, $settings);
-
 
   // Add a submit button
   $form['actions']['#type'] = 'actions';
@@ -242,7 +254,9 @@ function diff_admin_global_field_settings_submit($form, &$form_state){
     if (is_array($value) && isset($form_state['values']['array_filter'])) {
       $value = array_keys(array_filter($value));
     }
-    $config->set($key, $value);
+    $setting_name = substr($key, 5);
+    $setting_name = substr($setting_name, 0,- 16);
+    $config->set("diff_field_default_options.$setting_name", $value);
   }
   $config->save();
   backdrop_set_message(t('The configuration options have been saved.'));

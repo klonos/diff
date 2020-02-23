@@ -229,12 +229,11 @@ function diff_field_diff_view($items, $context) {
  */
 function diff_get_field_settings($field_context) {
   $field = $field_context['field'];
-
+  $field_type = $field['type'];
   // Update saved settings from the global settings for this field type.
-  $settings = variable_get("diff_{$field['module']}_field_{$field['type']}_default_options", array());
-
+  $settings = config_get('diff.settings',"diff_field_default_options.$field_type");
+  // Use another helper function to populate the settings array.
   $settings = _diff_field_default_settings($field['module'], $field['type'], $settings);
-
   // Allow modules to alter the field settings based on the current context.
   backdrop_alter('diff_field_settings', $settings, $field_context);
 
@@ -275,32 +274,6 @@ function diff_global_settings_form(&$subform, $form_state, $type, $settings) {
       'line_continuous' => t('Count and show lines, incrementing counter from last item.'),
     ),
   );
-
-  /*
-This would be cool, but to do anything else than inline with the text appears
-to be very hard, requiring a refactoring of both the modules API but also the
-DiffFormatter and Diff classes. Diff 8.x-4.x maybe.
-
-  $subform['show_delta'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Show delta values'),
-    '#default_value' => $settings['show_delta'],
-  );
-  $subform['delta_format'] = array(
-    '#type' => 'radios',
-    '#title' => t('Delta insertion method'),
-    '#default_value' => $settings['delta_format'],
-    '#options' => array(
-      'inline' => t('Prefix to item'),
-      'row' => t('Individual row'),
-    ),
-    '#states' => array(
-      'invisible' => array(
-        "input[id$='show-delta']" => array('checked' => FALSE),
-      ),
-    ),
-  );
-  */
 }
 
 /**
