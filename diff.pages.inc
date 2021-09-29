@@ -244,29 +244,31 @@ function diff_diffs_show($node, $old_vid, $new_vid, $state = NULL) {
     ),
   );
 
-  $links = array();
+  $diff_modes = '';
   foreach (diff_available_states('node') as $alternative_state => $label) {
     if ($alternative_state == $state) {
       // @todo: Should we show both or just alternatives?
     }
-    $links[$alternative_state] = array(
-      'title' => $label,
-      'href' => "node/{$node->nid}/revisions/view/{$old_vid}/{$new_vid}" . ($alternative_state == $default_state ? '' : '/' . str_replace('_', '-', $alternative_state)),
-    );
-  }
-  if (count($links) > 1) {
-    $state_links = theme('links', array(
-      'links' => $links,
-      'attributes' => array('class' => array('links', 'inline')),
+    $diff_modes .= theme('link', array(
+      'text' => $label,
+      'path' => "node/{$node->nid}/revisions/view/{$old_vid}/{$new_vid}" . ($alternative_state == $default_state ? '' : '/' . str_replace('_', '-', $alternative_state)),
+      'options' => array(
+        'attributes' => array('class' => array('button', 'button-secondary')),
+      ),
     ));
+
+  }
+
+  if (!empty($diff_modes)) {
     $rows['states'] = array(
       array(
-        'data' => $state_links,
+        'data' => '<strong>' . t('Switch diff mode:') . '</strong>' . $diff_modes,
         'class' => 'diff-links',
         'colspan' => 4,
       ),
     );
   }
+
   $rows = array_merge($rows, _diff_body_rows($old_node, $new_node, $state));
 
   $build['diff_table'] = array(
