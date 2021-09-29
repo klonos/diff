@@ -27,7 +27,7 @@ function _node_entity_diff_additional_options_title($old_node, $new_node, $conte
         );
         break;
 
-      // We specify a default so that the title is allows compared.
+      // We specify a default, so that the title is always compared.
       case 'raw':
       default:
         $row['#states'][$state] = array(
