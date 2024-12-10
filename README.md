@@ -35,6 +35,7 @@ directory for complete text.
 ## Current maintainers
 - [Graham Oliver](https://github.com/Graham-72) (original port to Backdrop)
 - [Greg Netsas (klonos)](https://github.com/klonos)
+- [Nate Lampton (quicksketch)](https://github.com/quicksketch)
 
 ## Credits
 Grateful thanks to the developers and maintainers (past and present) of the Drupal 7 module.
