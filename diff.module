@@ -177,8 +177,8 @@ function diff_menu_alter(&$callbacks) {
  */
 function diff_admin_paths_alter(&$paths) {
   // By default, treat all diff pages as administrative.
-  if (config_get('diff.settings', 'diff_admin_path . node')) {
-    $paths['node/*/revisions/view/*/*'] = TRUE;
+  if (config_get('diff.settings', 'diff_admin_path.node')) {
+    $paths['node/*/revisions/view'] = TRUE;
   }
 }
 
