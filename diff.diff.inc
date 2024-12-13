@@ -346,8 +346,8 @@ function _diff_autoload($field_or_module) {
  */
 function diff_extract_state($diff, $state = 'raw') {
   $states = array(
-    0 => NULL,
-    1 => NULL,
+    0 => '',
+    1 => '',
   );
   if (isset($diff['#states'][$state])) {
     if (isset($diff['#states'][$state]['#old'])) {

@@ -156,14 +156,14 @@ function diff_node_revisions_validate($form, &$form_state) {
 /**
  * Create a comparison for the node between versions 'old_vid' and 'new_vid'.
  *
- * @param object $node
+ * @param Node $node
  *   Node on which to perform comparison
  * @param integer $old_vid
  *   Version ID of the old revision.
  * @param integer $new_vid
  *   Version ID of the new revision.
  */
-function diff_diffs_show($node, $old_vid, $new_vid, $state = NULL) {
+function diff_diffs_show(Node $node, $old_vid, $new_vid, $state = '') {
   // Attaches the CSS.
   $build['#attached'] = diff_build_attachments();
   $build['info'] = array(
@@ -477,7 +477,7 @@ function diff_compare_entities($left_entity, $right_entity, $context) {
 
   // One of the children has a #weight.
   if (!isset($diff['#sorted'])) {
-    uasort($diff, 'element_sort');
+    backdrop_sort($diff, array('#weight'));
   }
 
   // Process the array and get line counts per field.
