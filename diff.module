@@ -724,18 +724,7 @@ function diff_config_info() {
 function diff_autoload_info()
 {
   return array(
-    'BackdropDiffInline' => 'DiffEngine.php',
-    'BackdropDiffFormatter' => 'DiffEngine.php',
-    'Diff' => 'DiffEngine.php',
-    'DiffFormatter' => 'DiffEngine.php',
-    'MappedDiff' => 'DiffEngine.php',
-    'WordLevelDiff' => 'DiffEngine.php',
-    '_DiffEngine' => 'DiffEngine.php',
-    '_DiffOp' => 'DiffEngine.php',
-    '_DiffOp_Add' => 'DiffEngine.php',
-    '_DiffOp_Copy' => 'DiffEngine.php',
-    '_DiffOp_Delete' => 'DiffEngine.php',
-    '_HWLDF_WordAccumulator' => 'DiffEngine.php',
+    'BackdropDiffInline' => 'includes/diff.backdrop_diff_inline.inc',
   );
 }
 
