@@ -133,17 +133,17 @@ function diff_node_revisions($form, $form_state, $node) {
 }
 
 /**
- * Submit code for input form to select two revisions.
+ * Submit code for input form to select two node revisions.
  */
 function diff_node_revisions_submit($form, &$form_state) {
-  // The ids are ordered so the old revision is always on the left.
+  // The node IDs are ordered so that the old revision is always on the left.
   $old_vid = min($form_state['values']['old'], $form_state['values']['new']);
   $new_vid = max($form_state['values']['old'], $form_state['values']['new']);
   $form_state['redirect'] = 'node/' . $form_state['values']['nid'] . '/revisions/view/' . $old_vid . '/' . $new_vid;
 }
 
 /**
- * Validation for input form to select two revisions.
+ * Validation for input form to select two node revisions.
  */
 function diff_node_revisions_validate($form, &$form_state) {
   $old_vid = $form_state['values']['old'];
@@ -167,9 +167,9 @@ function diff_diffs_show($node, $old_vid, $new_vid, $state = NULL) {
   // Attaches the CSS.
   $build['#attached'] = diff_build_attachments();
   $build['info'] = array(
-    '#markup' => t('<strong>Comparing two revisions:</strong>'),
+    '#markup' => '<strong>' . t('Comparing two revisions:') . '</strong>',
   );
-  $default_state = config_get('diff.settings','diff_default_state_node');
+  $default_state = config_get('diff.settings', 'diff_default_state.node');
   if (empty($state)) {
     $state = $default_state;
   }
@@ -311,7 +311,7 @@ function diff_diffs_show($node, $old_vid, $new_vid, $state = NULL) {
  *   The context used to render the diff.
  */
 function diff_entity_body_rows($entity_type, $left_entity, $right_entity, $context = array()) {
-  // This is an unique index only, so no need for backdrop_static().
+  // This is a unique index only, so no need for backdrop_static().
   static $table_row_counter = 0;
 
   if ($theme = config_get('diff.settings','diff_theme')) {
